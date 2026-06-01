@@ -2,5 +2,5 @@
 
 public interface ICategoryRepository
 {
-    Task<IEnumerable<Category>> GetAllCategoriesAsync();
+    Task<IEnumerable<Category>> GetAllCategoriesAsync(CancellationToken cancellationToken);
 }
