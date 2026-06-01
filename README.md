@@ -10,3 +10,8 @@
 
 Авторский курс `C#: Создаём API для маркетплейса на микросервисах` от Сергея Камянецкого.  
 [ссылка на курс](https://stepik.org/course/249828/info)
+
+
+### Практика по курсу
+
+https://github.com/iksergey/marketplace-public/blob/main/specs/readme.md
