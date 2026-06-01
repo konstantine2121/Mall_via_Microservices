@@ -1,11 +1,12 @@
 ﻿using Catalog.Domain.Repositories;
+using Marten;
 
 namespace Catalog.Infrastructure.Repositories;
 
-public class BrandRepository : IBrandRepository
+public class BrandRepository (IDocumentSession session) : IBrandRepository
 {
-    public Task<IEnumerable<Brand>> GetAllBrandsAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Brand>> GetAllBrandsAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return  await session.Query<Brand>().ToListAsync(cancellationToken);
     }
 }
