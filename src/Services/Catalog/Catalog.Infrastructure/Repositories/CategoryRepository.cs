@@ -1,11 +1,13 @@
 ﻿using Catalog.Domain.Repositories;
+using Marten;
 
 namespace Catalog.Infrastructure.Repositories;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryRepository(IDocumentSession session)
+    : ICategoryRepository
 {
-    public Task<IEnumerable<Category>> GetAllCategoriesAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Category>> GetAllCategoriesAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return  await session.Query<Category>().ToListAsync(cancellationToken);
     }
 }

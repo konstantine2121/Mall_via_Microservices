@@ -1,41 +1,82 @@
 ﻿using Catalog.Domain.Repositories;
+using Marten;
 
 namespace Catalog.Infrastructure.Repositories;
 
-public class CatalogItemRepository : ICatalogItemRepository
+public class CatalogItemRepository(IDocumentSession session)
+    : ICatalogItemRepository
 {
-    public Task<CatalogItem> CreateCatalogItemAsync(CatalogItem item, CancellationToken cancellationToken)
+    public async Task<CatalogItem> CreateCatalogItemAsync(CatalogItem item, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        session.Store(item);
+        await session.SaveChangesAsync(cancellationToken);
+        return item;
+    }
+    
+    public async Task<IEnumerable<CatalogItem>> GetAllCatalogItemsAsync(CancellationToken cancellationToken)
+    {
+        return  await session.Query<CatalogItem>().ToListAsync(cancellationToken);
     }
 
-    public Task<IEnumerable<CatalogItem>> GetAllCatalogItemsAsync(CancellationToken cancellationToken)
+    public async Task<CatalogItem?> GetCatalogItemAsync(Guid id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        CatalogItem? item = await session.Query<CatalogItem>()
+            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        
+        return item;
     }
 
-    public Task<CatalogItem?> GetCatalogItemAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<IEnumerable<CatalogItem>> GetCatalogItemsByTitleAsync(string title, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var items = await session.Query<CatalogItem>()
+            .Where(i => CompareTitles(i.Title,title))
+            .ToListAsync(cancellationToken);
+        
+        return items;
+    }
+    
+    public async Task<IEnumerable<CatalogItem>> GetCatalogItemsByBrandAsync(string brandTitle, CancellationToken cancellationToken)
+    {
+        var items = await session.Query<CatalogItem>()
+            .Where(i => i.Brand != null && CompareTitles(i.Brand.Title,brandTitle))
+            .ToListAsync(cancellationToken);
+        
+        return items;
+    }
+ 
+    public async Task<bool> UpdateCatalogItemAsync(CatalogItem item, CancellationToken cancellationToken)
+    {
+        bool hasRecord = await HasRecord(item.Id, cancellationToken);
+        
+        if (hasRecord)
+        {
+            session.Store(item);
+            await session.SaveChangesAsync(cancellationToken);
+        }
+        
+        return hasRecord;
     }
 
-    public Task<IEnumerable<CatalogItem>> GetCatalogItemsByTitleAsync(string title, CancellationToken cancellationToken)
+    public async Task<bool> DeleteCatalogItemAsync(Guid id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        bool hasRecord = await HasRecord(id, cancellationToken);
 
-    public Task<IEnumerable<CatalogItem>> GetCatalogItemsByBrandAsync(string brandTitle, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        if (hasRecord)
+        {
+            session.Delete<CatalogItem>(id);
+            await session.SaveChangesAsync(cancellationToken);
+        }
+        return hasRecord;
     }
-
-    public Task<bool> UpdateCatalogItemAsync(CatalogItem item, CancellationToken cancellationToken)
+    
+    private async Task<bool> HasRecord(Guid id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        return await session.Query<CatalogItem>()
+            .AnyAsync(i => i.Id == id, cancellationToken);
     }
-
-    public Task<bool> DeleteCatalogItemAsync(Guid id, CancellationToken cancellationToken)
+    
+    private static bool CompareTitles(string? originTitle, string? searchPattern)
     {
-        throw new NotImplementedException();
+        return originTitle == searchPattern;
     }
 }
