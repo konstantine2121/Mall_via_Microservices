@@ -9,7 +9,7 @@ public class InitializeDatabaseAsync : IInitialData
     {
         using var session = store.LightweightSession();
 
-        if (!await session.Query<Brand>().AnyAsync())
+        if (!await session.Query<Brand>().AnyAsync(cancellation))
         {
             session.Store<Brand>(InitialData.Brands);
             await session.SaveChangesAsync(cancellation);
@@ -17,7 +17,7 @@ public class InitializeDatabaseAsync : IInitialData
 
         foreach (var category in InitialData.Categories)
         {
-            if (!session.Query<Category>().Any(c => c.Id == category.Id))
+            if (!await session.Query<Category>().AnyAsync(c => c.Id == category.Id, cancellation))
             {
                 session.Store(category);
             }
@@ -25,7 +25,7 @@ public class InitializeDatabaseAsync : IInitialData
         
         foreach (var item in InitialData.CatalogItems)
         {
-            if (!session.Query<CatalogItem>().Any(i => i.Id == item.Id))
+            if (!await session.Query<CatalogItem>().AnyAsync(i => i.Id == item.Id, cancellation))
             {
                 session.Store(item);
             }
