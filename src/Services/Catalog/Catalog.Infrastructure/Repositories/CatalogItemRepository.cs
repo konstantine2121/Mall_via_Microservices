@@ -20,10 +20,7 @@ public class CatalogItemRepository(IDocumentSession session)
 
     public async Task<CatalogItem?> GetCatalogItemAsync(Guid id, CancellationToken cancellationToken)
     {
-        CatalogItem? item = await session.Query<CatalogItem>()
-            .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
-        
-        return item;
+        return await session.LoadAsync<CatalogItem>(id, cancellationToken);
     }
 
     public async Task<IEnumerable<CatalogItem>> GetCatalogItemsByTitleAsync(string title, CancellationToken cancellationToken)
@@ -43,40 +40,26 @@ public class CatalogItemRepository(IDocumentSession session)
         
         return items;
     }
- 
+
     public async Task<bool> UpdateCatalogItemAsync(CatalogItem item, CancellationToken cancellationToken)
     {
-        bool hasRecord = await HasRecord(item.Id, cancellationToken);
-        
-        if (hasRecord)
-        {
-            session.Store(item);
-            await session.SaveChangesAsync(cancellationToken);
-        }
-        
-        return hasRecord;
+        session.Store(item);
+        await session.SaveChangesAsync(cancellationToken);
+        return true;
     }
 
     public async Task<bool> DeleteCatalogItemAsync(Guid id, CancellationToken cancellationToken)
     {
-        bool hasRecord = await HasRecord(id, cancellationToken);
-
-        if (hasRecord)
-        {
-            session.Delete<CatalogItem>(id);
-            await session.SaveChangesAsync(cancellationToken);
-        }
-        return hasRecord;
-    }
-    
-    private async Task<bool> HasRecord(Guid id, CancellationToken cancellationToken)
-    {
-        return await session.Query<CatalogItem>()
-            .AnyAsync(i => i.Id == id, cancellationToken);
+        session.Delete<CatalogItem>(id);
+        await session.SaveChangesAsync(cancellationToken);
+        return true;
     }
     
     private static bool CompareTitles(string? originTitle, string? searchPattern)
     {
-        return originTitle == searchPattern;
+        if (string.IsNullOrEmpty(originTitle) ||  string.IsNullOrEmpty(searchPattern))
+            return false;
+        
+        return originTitle.Contains(searchPattern, StringComparison.OrdinalIgnoreCase);
     }
 }
