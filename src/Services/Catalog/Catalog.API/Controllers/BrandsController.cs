@@ -8,12 +8,11 @@ namespace Catalog.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BrandsController (IMediator mediator)
-    : ControllerBase
+public class BrandsController : ApiController
 {
     [HttpGet]
     public async Task<ActionResult<GetBrandsResult>> GetBrands()
     {
-        return await mediator.Send(new GetBrandsQuery());
+        return await Mediator.Send(new GetBrandsQuery());
     }
 }
