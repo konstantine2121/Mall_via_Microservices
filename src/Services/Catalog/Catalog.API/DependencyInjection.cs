@@ -14,9 +14,11 @@ public static class DependencyInjection
         
         //var assembly = typeof(GetBrandsQuery).Assembly;
         var assembly = typeof(Application.DependencyInjection).Assembly;
+        var licenseKey = configuration.GetSection("MediatR:LicenseKey").Value;
 
         services.AddMediatR(config =>
         {
+            config.LicenseKey = licenseKey;
             config.RegisterServicesFromAssembly(assembly);
         });
         
