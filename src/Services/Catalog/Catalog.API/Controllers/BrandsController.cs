@@ -13,6 +13,7 @@ public class BrandsController : ApiController
     [HttpGet]
     public async Task<ActionResult<GetBrandsResult>> GetBrands()
     {
-        return await Mediator.Send(new GetBrandsQuery());
+        var result = await Mediator.Send(new GetBrandsQuery());
+        return Ok(result);
     }
 }
