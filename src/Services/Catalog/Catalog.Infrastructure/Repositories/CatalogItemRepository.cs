@@ -26,7 +26,7 @@ public class CatalogItemRepository(IDocumentSession session)
     public async Task<IEnumerable<CatalogItem>> GetCatalogItemsByTitleAsync(string title, CancellationToken cancellationToken)
     {
         var items = await session.Query<CatalogItem>()
-            .Where(i => CompareTitles(i.Title,title))
+            .Where(i => i.Title != null && i.Title.Contains(title, StringComparison.OrdinalIgnoreCase))
             .ToListAsync(cancellationToken);
         
         return items;
@@ -35,7 +35,10 @@ public class CatalogItemRepository(IDocumentSession session)
     public async Task<IEnumerable<CatalogItem>> GetCatalogItemsByBrandAsync(string brandTitle, CancellationToken cancellationToken)
     {
         var items = await session.Query<CatalogItem>()
-            .Where(i => i.Brand != null && CompareTitles(i.Brand.Title,brandTitle))
+            .Where(i => 
+                i.Brand != null 
+                && i.Brand.Title != null 
+                && i.Brand.Title.Contains(brandTitle, StringComparison.OrdinalIgnoreCase))
             .ToListAsync(cancellationToken);
         
         return items;
@@ -55,11 +58,12 @@ public class CatalogItemRepository(IDocumentSession session)
         return true;
     }
     
-    private static bool CompareTitles(string? originTitle, string? searchPattern)
-    {
-        if (string.IsNullOrEmpty(originTitle) ||  string.IsNullOrEmpty(searchPattern))
-            return false;
-        
-        return originTitle.Contains(searchPattern, StringComparison.OrdinalIgnoreCase);
-    }
+    // Can't call it in Marten's LINQ 
+    //private static bool CompareTitles(string? originTitle, string? searchPattern)
+    //{
+    //    if (string.IsNullOrEmpty(originTitle) ||  string.IsNullOrEmpty(searchPattern))
+    //        return false;
+    //    
+    //    return originTitle.Contains(searchPattern, StringComparison.OrdinalIgnoreCase);
+    //}
 }
