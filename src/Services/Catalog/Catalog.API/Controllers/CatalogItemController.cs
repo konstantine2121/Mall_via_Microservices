@@ -1,7 +1,5 @@
-﻿using System.Net;
-using Catalog.Application.Queries.CatalogItemQueries;
+﻿using Catalog.Application.Queries.CatalogItemQueries;
 using Catalog.Application.Responses.CatalogItemResponses;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers;
 

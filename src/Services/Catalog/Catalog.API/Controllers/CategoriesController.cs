@@ -1,7 +1,5 @@
-﻿using System.Net;
-using Catalog.Application.Queries.CategoryQueries;
+﻿using Catalog.Application.Queries.CategoryQueries;
 using Catalog.Application.Responses.CategoryResponses;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers;
 
