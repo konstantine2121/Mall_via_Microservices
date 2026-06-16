@@ -6,7 +6,7 @@ namespace Catalog.Application.Handlers.CatalogItemHandlers;
 public class GetCatalogItemsQueryHandler (ICatalogItemRepository catalogItemRepository)
     : IRequestHandler<GetCatalogItemsQuery,GetCatalogItemsResult>
 {
-    public async Task<GetCatalogItemsResult> Handle(GetCatalogItemsQuery request, CancellationToken cancellationToken)
+    public async Task<GetCatalogItemsResult> Handle(GetCatalogItemsQuery query, CancellationToken cancellationToken)
     {
         var catalogItems = await catalogItemRepository.GetAllCatalogItemsAsync(cancellationToken);
         
