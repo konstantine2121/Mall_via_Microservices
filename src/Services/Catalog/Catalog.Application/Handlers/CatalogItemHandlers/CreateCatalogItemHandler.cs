@@ -6,8 +6,9 @@ using Mapster;
 namespace Catalog.Application.Handlers.CatalogItemHandlers;
 
 public class CreateCatalogItemHandler (ICatalogItemRepository catalogItemRepository,
-    IBrandRepository brandRepository,
-    ICategoryRepository categoryRepository)
+    IBrandRepository brandRepository, //for Validation only
+    ICategoryRepository categoryRepository //for Validation only
+    )
     : IRequestHandler<CreateCatalogItemCommand, CreateCatalogItemResult>
 {
     public async Task<CreateCatalogItemResult> Handle(CreateCatalogItemCommand command,
