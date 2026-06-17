@@ -66,4 +66,3 @@ public class CatalogItemController : ApiController
         return Ok(result);
     }
 }
-
