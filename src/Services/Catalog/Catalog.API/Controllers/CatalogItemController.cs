@@ -1,4 +1,5 @@
-﻿using Catalog.Application.Queries.CatalogItemQueries;
+﻿using Catalog.Application.Commands.CatalogItemCommands;
+using Catalog.Application.Queries.CatalogItemQueries;
 using Catalog.Application.Responses.CatalogItemResponses;
 
 namespace Catalog.API.Controllers;
@@ -35,6 +36,17 @@ public class CatalogItemController : ApiController
     {
         var result = await Mediator.Send(new GetCatalogItemByBrandTitleQuery(brandTitle));
         return Ok(result);
+    }
+    
+    [HttpPost]
+    [ProducesResponseType(typeof(CreateCatalogItemResult), StatusCodes.Status201Created)]
+    public async Task<ActionResult<CreateCatalogItemResult>> CreateCatalogItem([FromBody] CreateCatalogItemCommand command)
+    {
+        var result = await Mediator.Send(command);
+        return CreatedAtAction(
+            nameof(GetCatalogItemById),
+            new { id = result.Id },
+            result);
     }
 }
 
