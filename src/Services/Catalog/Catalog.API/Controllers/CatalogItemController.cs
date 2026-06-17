@@ -28,5 +28,13 @@ public class CatalogItemController : ApiController
         var result = await Mediator.Send(new GetCatalogItemByTitleQuery(catalogItemTitle));
         return Ok(result);
     }
+    
+    [HttpGet("brand/{brandTitle}")]
+    [ProducesResponseType(typeof(GetCatalogItemByBrandTitleResult), (int)HttpStatusCode.OK)]
+    public async Task<ActionResult<GetCatalogItemByBrandTitleResult>> GetCatalogItemsByBrandTitle(string brandTitle)
+    {
+        var result = await Mediator.Send(new GetCatalogItemByBrandTitleQuery(brandTitle));
+        return Ok(result);
+    }
 }
 
