@@ -56,5 +56,14 @@ public class CatalogItemController : ApiController
         var result = await Mediator.Send(command);
         return Ok(result);
     }
+    
+    
+    [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(DeleteCatalogItemByIdResult), StatusCodes.Status200OK)]
+    public async Task<ActionResult<DeleteCatalogItemByIdResult>> DeleteCatalogItem(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteCatalogItemByIdCommand(id));
+        return Ok(result);
+    }
 }
 
