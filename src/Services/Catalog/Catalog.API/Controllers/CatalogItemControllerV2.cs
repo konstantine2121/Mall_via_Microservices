@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Catalog.Application.Queries.CatalogItemQueries;
 using Catalog.Application.Responses.CatalogItemResponses;
+using Catalog.Domain.Specifications;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Catalog.API.Controllers;
@@ -14,10 +15,9 @@ public class CatalogItemControllerV2 : ApiController
     [ProducesResponseType(typeof(GetCatalogItemsResultV2), (int)HttpStatusCode.OK)]
     [SwaggerOperation(Tags = new [] { "CatalogItemControllerV2" })]
     public async Task<ActionResult<GetCatalogItemsResultV2>> GetCatalogItems(
-        [FromQuery] int pageIndex = 1, 
-        [FromQuery] int pageSize = 5)
+        [FromQuery] QueryArgs args)
     {
-        var query = new GetCatalogItemsQueryV2(pageIndex, pageSize);       
+        var query = new GetCatalogItemsQueryV2(args);       
         var result = await Mediator.Send(query);
         return Ok(result);
     }
