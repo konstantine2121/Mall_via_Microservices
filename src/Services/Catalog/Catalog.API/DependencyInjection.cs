@@ -40,6 +40,9 @@ public static class DependencyInjection
             });
             
             config.EnableAnnotations();
+            
+            var baseDirectory = AppContext.BaseDirectory;
+            config.IncludeXmlComments(Path.Combine(baseDirectory, "Catalog.Domain.xml"));
         });
         
         //var assembly = typeof(GetBrandsQuery).Assembly;
