@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Repositories;
+using Catalog.Domain.Specifications;
 using Marten;
 
 namespace Catalog.Infrastructure.Repositories;
@@ -16,6 +17,66 @@ public class CatalogItemRepository(IDocumentSession session)
     public async Task<IEnumerable<CatalogItem>> GetAllCatalogItemsAsync(CancellationToken cancellationToken)
     {
         return  await session.Query<CatalogItem>().ToListAsync(cancellationToken);
+    }
+
+    public async Task<Pagination<CatalogItem>> GetAllCatalogItemsAsync(QueryArgs args, CancellationToken cancellationToken)
+    {
+        var allItems = session.Query<CatalogItem>()
+            .AsQueryable();
+        
+        var brandId = args.BrandId;
+        if (brandId is not null)
+        {
+            allItems = allItems.Where(e =>  
+                e.Brand != null
+                && e.Brand.Id == brandId);
+        }
+        
+        var categoryId = args.CategoryId;
+        if (categoryId is not null)
+        {
+            allItems = allItems.Where(e => 
+                e.Category != null 
+                && e.Category.Id == categoryId);
+        }
+        
+        var search = args.Search;
+        if (!String.IsNullOrWhiteSpace(search))
+        {
+            allItems = allItems.Where(e => 
+                e.Title != null
+                && e.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+        
+        var sort = args.Search;
+        if (!String.IsNullOrWhiteSpace(sort))
+        {
+            allItems = sort.ToLower() switch
+            {
+                // asc -  ascending (по возрастанию)
+                // desc -  descending (по убыванию)
+                "price_desc" => allItems.OrderByDescending(i => i.Price),
+                "price_asc" => allItems.OrderBy(i => i.Price),
+                "title_desc" => allItems.OrderByDescending(i => i.Title),
+                "title_asc" => allItems.OrderBy(i => i.Title),
+                _ => allItems
+            };
+        }
+        
+        var count  = await allItems.CountAsync(cancellationToken);
+        
+        var items = await allItems
+            .Skip((args.PageIndex - 1) * args.PageSize)
+            .Take(args.PageSize)
+            .ToListAsync();
+        
+        var pagination = new Pagination<CatalogItem>(
+            PageIndex: args.PageIndex,
+            PageSize: args.PageSize,
+            TotalCount: count,
+            Items: items
+        );
+        return pagination;
     }
 
     public async Task<CatalogItem?> GetCatalogItemAsync(Guid id, CancellationToken cancellationToken)
